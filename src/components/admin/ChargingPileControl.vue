@@ -19,15 +19,18 @@ export default {
     },
     methods: {
         getChargingPilesStatus() {  // 获取所有充电桩id及其对应状态
-            get("/api/charging-piles", (data, message) => {
-                this.chargingPiles = data;
+            get("/api/admin/pile/status", (data, message) => {
+                this.chargingPiles = data.map(item => ({
+                    ...item,
+                    status: item.status === 1
+                }));
                 ElMessage.success(message);
             });
         },
         handleStatusChange(row) {  // 一旦修改了某个充电桩的状态，就向后端发送修改请求
-            // post("/api/charging-piles/update", { id: row.id, status: row.status }, message => {
-            //     ElMessage.success(message);
-            // });
+            post(`/api/admin/pile/${row.id}/status`, { status: row.status ? 1 : 0}, message => {
+                ElMessage.success(message);
+            });
         }
     }
 };
@@ -37,6 +40,7 @@ export default {
     <div>
         <el-table :data="chargingPiles" style="width: 100%">
             <el-table-column prop="id" label="充电桩ID" width="180"></el-table-column>
+            <el-table-column prop="pileCode" label="充电桩编号" width="180"></el-table-column>
             <el-table-column prop="status" label="状态" width="180">
                 <template #default="{ row }">
                     <el-switch v-model="row.status" active-color="#13ce66" inactive-color="#ff4949" active-text="启动"

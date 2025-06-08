@@ -2,6 +2,8 @@
 import ChargingDetails from '../components/user/ChargingDetails.vue';
 import ChargingRequest from '../components/user/ChargingRequest.vue';
 import QueueInfo from '../components/user/QueueInfo.vue';
+import { post } from "@/net";
+import { ElMessage } from "element-plus";
 export default {
   components: {
     ChargingDetails,   // 充电详单
@@ -11,21 +13,13 @@ export default {
   data() {
     return {
       activeTab: 'ChargingDetails',  // 存储当前激活的组件名称
-      canEdit: false,
-      queueNumber: 5,
-      waitingCount: 3
     };
   },
   methods: {
-    handleSubmit() {
-      this.canEdit = true;
-      // 提交充电请求的逻辑
-    },
-    handleModify() {
-      // 修改充电请求的逻辑
-    },
     endCharging() {
-      // 结束充电的逻辑
+      post('/api/charging/end', (message) => {
+        ElMessage.success(message);
+      });
     },
     logout() {
       localStorage.removeItem('token')  // 移除token
@@ -49,7 +43,7 @@ export default {
           <component :is="activeTab" />
         </div>
         <div class="actions">
-          <el-button type="danger" @click="endCharging">取消充电</el-button>
+          <el-button type="danger" @click="endCharging">结束充电</el-button>
           <el-button @click="logout">退出登录</el-button>
         </div>
       </div>

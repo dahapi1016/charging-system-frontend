@@ -16,7 +16,7 @@ export default {
         username: this.username,
         password: this.password
       };
-      post('/user/register', data, (message) => {
+      post('/api/user/register', data, (message) => {
         ElMessage.success(message);
         this.$router.push('/user/index');
       });

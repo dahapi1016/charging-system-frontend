@@ -6,20 +6,25 @@ export default {
     data() {
         return {
             requestForm: {
-                chargingMode: '',
-                chargeAmount: ''
+                chargingMode: 1,
+                chargeAmount: 0,
+                batteryCapacity: 0
             }
-
         };
     },
     methods: {
         submitRequest() {
-            post('/user/login', this.requestForm, (message) => {
+            post('/api/charging/request', this.requestForm, (message) => {
                 ElMessage.success(message);
             });
         },
-        resetForm() {
-            post('/user/login', this.requestForm, (message) => {
+        changeRequest() {
+            post('/api/charging/request/change', this.requestForm, (message) => {
+                ElMessage.success(message);
+            });
+        }, 
+        cancelRequest() {
+            post('/api/charging/request/cancel', (message) => {
                 ElMessage.success(message);
             });
         }
@@ -37,16 +42,20 @@ export default {
         <el-form ref="requestForm" :model="requestForm" label-width="120px">
             <el-form-item label="充电模式">
                 <el-radio-group v-model="requestForm.chargingMode">
-                    <el-radio label="快充">快充</el-radio>
-                    <el-radio label="慢充">慢充</el-radio>
+                    <el-radio label="1">快充</el-radio>
+                    <el-radio label="2">慢充</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="充电量(度)">
-                <el-input-number v-model="requestForm.chargeAmount" :min="1" :max="100" />
+                <el-input-number v-model="requestForm.chargeAmount" :min="1" :max="200" />
             </el-form-item>
-            <el-form-item class="form-buttons">
+            <el-form-item label="车辆电池容量(度)">
+                <el-input-number v-model="requestForm.batteryCapacity" :min="1" :max="200" />
+            </el-form-item>
+            <el-form-item class="form-buttons" style="text-align: center;">
                 <el-button type="primary" @click="submitRequest">提交请求</el-button>
-                <el-button @click="resetForm">修改请求</el-button>
+                <el-button @click="changeRequest">修改请求</el-button>
+                <el-button type="danger" @click="cancelRequest">取消请求</el-button>
             </el-form-item>
         </el-form>
     </el-card>

@@ -6,7 +6,9 @@ export default {
     data() {
         return {
             queueNumber: 8,
-            waitingCount: 10
+            waitingCount: 10,
+            totalWaitingCount: 0,
+            estimatedWaitingTime: 0
         };
     },
     mounted() {
@@ -14,9 +16,11 @@ export default {
     },
     methods: {
         getQueueInfo() {
-            get('/api/charging-piles', (data, message) => {
+            get('/api/charging/queue/status', (data, message) => {
                 this.queueNumber = data.queueNumber;
                 this.waitingCount = data.waitingCount;
+                this.totalWaitingCount = data.totalWaitingCount,
+                this.estimatedWaitingTime = data.estimatedWaitingTime
                 ElMessage.success(message);
             });
         },
@@ -36,6 +40,18 @@ export default {
             <el-col :span="12">
                 <div class="queue-info">
                     <h3>前车等待数量</h3>
+                    <p>{{ waitingCount }}</p>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="queue-info">
+                    <h3>同类型总等待数</h3>
+                    <p>{{ totalWaitingCount }}</p>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="queue-info">
+                    <h3>预计等待时间</h3>
                     <p>{{ waitingCount }}</p>
                 </div>
             </el-col>

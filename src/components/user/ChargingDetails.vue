@@ -5,18 +5,19 @@ import { get } from '@/net';
 export default {
     data() {
         return {
-            chargingDetails: {
-                detailId: '123456789',
-                generatedTime: '2023-10-01 10:00:00',
-                chargingPileId: 1,
-                chargeEnergy: 20,
-                chargeDuration: 120,
-                startTime: '2023-10-01 09:00:00',
-                endTime: '2023-10-01 11:00:00',
-                chargeCost: 200,
-                serviceCost: 50,
-                totalCost: 250
-            }
+            // chargingDetails: {
+            //     billNumber: '123456789',
+            //     createTime: '2023-10-01 10:00:00',
+            //     pileCode: 1,
+            //     chargingAmount: 20,
+            //     chargingDuration: 120,
+            //     startTime: '2023-10-01 09:00:00',
+            //     endTime: '2023-10-01 11:00:00',
+            //     chargingFee: 200,
+            //     serviceFee: 50,
+            //     totalFee: 250
+            // }
+            chargingDetails: []
         };
     },
     mounted() {
@@ -24,7 +25,7 @@ export default {
     },
     methods: {
         getChargingDetails() {
-            get('/api/charging-piles', (data, message) => {
+            get('/api/billing/list', (data, message) => {
                 this.chargingDetails = data;
                 ElMessage.success(message);
             });
@@ -45,13 +46,13 @@ export default {
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">详单编号:</span>
-                        <span class="detail-value">{{ chargingDetails.detailId }}</span>
+                        <span class="detail-value">{{ chargingDetails.billNumber }}</span>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">详单生成时间:</span>
-                        <span class="detail-value">{{ chargingDetails.generatedTime }}</span>
+                        <span class="detail-value">{{ chargingDetails.createTime }}</span>
                     </div>
                 </el-col>
             </el-row>
@@ -59,13 +60,13 @@ export default {
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">充电桩编号:</span>
-                        <span class="detail-value">{{ chargingDetails.chargingPileId }}</span>
+                        <span class="detail-value">{{ chargingDetails.pileCode }}</span>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">充电电量(度):</span>
-                        <span class="detail-value">{{ chargingDetails.chargeEnergy }}</span>
+                        <span class="detail-value">{{ chargingDetails.chargingAmount }}</span>
                     </div>
                 </el-col>
             </el-row>
@@ -73,7 +74,7 @@ export default {
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">充电时长(分钟):</span>
-                        <span class="detail-value">{{ chargingDetails.chargeDuration }}</span>
+                        <span class="detail-value">{{ chargingDetails.chargingDuration }}</span>
                     </div>
                 </el-col>
                 <el-col :span="12">
@@ -93,7 +94,7 @@ export default {
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">充电费用:</span>
-                        <span class="detail-value">{{ chargingDetails.chargeCost }}</span>
+                        <span class="detail-value">{{ chargingDetails.chargingFee }}</span>
                     </div>
                 </el-col>
             </el-row>
@@ -101,13 +102,13 @@ export default {
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">服务费用:</span>
-                        <span class="detail-value">{{ chargingDetails.serviceCost }}</span>
+                        <span class="detail-value">{{ chargingDetails.serviceFee }}</span>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="detail-item">
                         <span class="detail-label">总费用:</span>
-                        <span class="detail-value">{{ chargingDetails.totalCost }}</span>
+                        <span class="detail-value">{{ chargingDetails.totalFee }}</span>
                     </div>
                 </el-col>
             </el-row>
