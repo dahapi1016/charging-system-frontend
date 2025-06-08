@@ -28,7 +28,7 @@ export default {
       // 结束充电的逻辑
     },
     logout() {
-      // 退出登录的逻辑
+      localStorage.removeItem('token')  // 移除token
       this.$router.push('/user/login');
     }
   }

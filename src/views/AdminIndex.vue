@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     logout() {
-      // 退出登录的逻辑
+      localStorage.removeItem('token')  // 移除token
       this.$router.push('/admin/login');
     }
   }
