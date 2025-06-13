@@ -5,8 +5,8 @@ import { get } from '@/net';
 export default {
     data() {
         return {
-            queueNumber: 8,
-            waitingCount: 10,
+            queueNumber: 0,
+            waitingCount: 0,
             totalWaitingCount: 0,
             estimatedWaitingTime: 0
         };
@@ -21,7 +21,14 @@ export default {
                 this.waitingCount = data.waitingCount;
                 this.totalWaitingCount = data.totalWaitingCount,
                 this.estimatedWaitingTime = data.estimatedWaitingTime
-                ElMessage.success(message);
+                // ElMessage.success(message);
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
         },
     },
@@ -52,7 +59,7 @@ export default {
             <el-col :span="12">
                 <div class="queue-info">
                     <h3>预计等待时间</h3>
-                    <p>{{ waitingCount }}</p>
+                    <p>{{ estimatedWaitingTime }}</p>
                 </div>
             </el-col>
         </el-row>

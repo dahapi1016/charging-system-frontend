@@ -1,10 +1,16 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import router from '../router';
 
-const defaultError = () => ElMessage.error('发生了一些错误，请联系管理员')
-const defaultFailure = (code, message) => ElMessage.warning(code + ':' + message)
+const defaultFailure = (code, message) => {
+    if (code === 400) {
+        ElMessage.error(message)
+    } else {
+        ElMessage.warning(code + ':' + message)
+    }
+}
 
-function internalPost(api, data, headers, success, failure = defaultFailure, error = defaultError) {  // 这里data是前端向后端发送的请求内容
+function internalPost(api, data, headers, success, failure = defaultFailure) {  // 这里data是前端向后端发送的请求内容
     axios.post(api, data, {
         headers: headers,
         withCredentials: true
@@ -13,10 +19,18 @@ function internalPost(api, data, headers, success, failure = defaultFailure, err
             success(data.data, data.message)
         else
             failure(data.code, data.message)
-    }).catch(error)
+    }).catch(err => {
+        // 尝试从错误响应中获取后端返回的错误信息
+        if (err.response && err.response.data) {
+            const responseData = err.response.data;
+            failure(responseData.code || 500, responseData.message || '未知错误');
+        } else {
+            ElMessage.error('请求失败，请检查网络连接');
+        }
+    })
 }
 
-function internalGet(api, headers, success, failure = defaultFailure, error = defaultError) {
+function internalGet(api, headers, success, failure = defaultFailure) {
     axios.get(api, {
         headers: headers,
         withCredentials: true
@@ -25,22 +39,37 @@ function internalGet(api, headers, success, failure = defaultFailure, error = de
             success(data.data, data.message)
         else
             failure(data.code, data.message)
-    }).catch(error)
-}
-
-function post(api, data, success, failure = defaultFailure, error = defaultError) {
-    internalPost(api, data, {'Authorization': `Bearer ${localStorage.getItem('token')}`}, success, failure, error)
-}
-
-function get(api, success, failure = defaultFailure, error = defaultError) {
-    internalGet(api, {'Authorization': `Bearer ${localStorage.getItem('token')}`}, success, failure, error)
-}
-
-function login(data) {
-    internalPost('/api/user/login', data, {'Content-Type': 'application/x-www-form-urlencoded'}, (data, message) => {
-        ElMessage.success(message);
-        localStorage.setItem('token', data.token);  // token存到localStorage
+    }).catch(err => {
+        // 尝试从错误响应中获取后端返回的错误信息
+        if (err.response && err.response.data) {
+            const responseData = err.response.data;
+            failure(responseData.code || 500, responseData.message || '未知错误');
+        } else {
+            ElMessage.error('请求失败，请检查网络连接');
+        }
     })
+}
+
+function post(api, data, success, failure = defaultFailure) {
+    internalPost(api, data, {'Authorization': `Bearer ${localStorage.getItem('token')}`}, success, failure)
+}
+
+function get(api, success, failure = defaultFailure) {
+    internalGet(api, {'Authorization': `Bearer ${localStorage.getItem('token')}`}, success, failure)
+}
+
+function login(data, failure = defaultFailure) {
+    internalPost('/api/user/login', data, {'Content-Type': 'application/json'}, (responseData, message) => {
+        // ElMessage.success(message);
+        localStorage.setItem('token', responseData.token);  // token存到localStorage
+
+        // 根据用户类型跳转到不同页面
+        if(responseData.userInfo.role === 'ADMIN') {
+            router.push('/admin/index');
+        } else {
+            router.push('/user/index');
+        }
+    }, failure)
 }
 
 export { get, post, login }

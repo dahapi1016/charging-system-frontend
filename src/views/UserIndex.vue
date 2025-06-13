@@ -18,7 +18,14 @@ export default {
   methods: {
     endCharging() {
       post('/api/charging/end', (message) => {
-        ElMessage.success(message);
+        // ElMessage.success(message);
+      },
+      (code, message) => {
+        if (code === 400) {
+          ElMessage.error(message);
+        } else {
+          ElMessage.warning(code + ':' + message);
+        }
       });
     },
     logout() {

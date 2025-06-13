@@ -5,52 +5,24 @@ import { get } from '@/net';
 export default {
     data() {
         return {
-            chargingPiles: [
-                {
-                    "id": 1,
-                    "vehicles": [
-                        {
-                            "userId": "12345",
-                            "batteryCapacity": 60,
-                            "requestedCharge": 30,
-                            "queueDuration": 45
-                        },
-                        {
-                            "userId": "67890",
-                            "batteryCapacity": 75,
-                            "requestedCharge": 50,
-                            "queueDuration": 30
-                        }
-                    ]
-                },
-                {
-                    "id": 2,
-                    "vehicles": [
-                        {
-                            "userId": "11111",
-                            "batteryCapacity": 70,
-                            "requestedCharge": 40,
-                            "queueDuration": 60
-                        },
-                        {
-                            "userId": "22222",
-                            "batteryCapacity": 80,
-                            "requestedCharge": 60,
-                            "queueDuration": 20
-                        }
-                    ]
-                }
-            ],
+            pileId: 1,
+            chargingPiles: [],
         };
     },
     mounted() {
-        this.getChargingPilesWaitingVehicles();  // 每次初始化该组件时调用
+        this.getChargingPileQueue();  // 每次初始化该组件时调用
     },
     methods: {
-        getChargingPilesWaitingVehicles() {
-            get('/api/charging-piles', (data, message) => {
+        getChargingPileQueue() {
+            get(`/api/admin/pile/queue?id=${this.pileId}`, (data) => {
                 this.chargingPiles = data;
-                ElMessage.success(message);
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
         },
     },
@@ -59,18 +31,25 @@ export default {
 
 <template>
     <div class="waiting-vehicles">
-        <el-card v-for="pile in chargingPiles" :key="pile.id" class="charging-pile-card">
+        <el-card class="charging-pile-card">
             <template #header>
                 <div class="card-header">
-                    <span>充电桩ID: {{ pile.id }}</span>
+                    <span>充电桩ID: {{ pileId }}</span>
+                    <el-input-number v-model="pileId" :min="1" @change="getChargingPileQueue" style="width: 120px;"></el-input-number>
                 </div>
             </template>
-            <el-table :data="pile.vehicles" style="width: 100%">
-                <el-table-column prop="userId" label="用户ID" width="180"></el-table-column>
-                <el-table-column prop="batteryCapacity" label="电池总容量(度)" width="180"></el-table-column>
-                <el-table-column prop="requestedCharge" label="请求充电量(度)" width="180"></el-table-column>
-                <el-table-column prop="queueDuration" label="排队时长(分钟)" width="180"></el-table-column>
-            </el-table>
+            <div class="table-container">
+                <el-table :data="chargingPiles" border size="small">
+                    <el-table-column prop="requestId" label="请求ID" width="80"></el-table-column>
+                    <el-table-column prop="userId" label="用户ID" width="80"></el-table-column>
+                    <el-table-column prop="username" label="用户名" width="100"></el-table-column>
+                    <el-table-column prop="batteryCapacity" label="电池容量(度)" width="100"></el-table-column>
+                    <el-table-column prop="requestAmount" label="请求量(度)" width="100"></el-table-column>
+                    <el-table-column prop="position" label="队列位置" width="80"></el-table-column>
+                    <el-table-column prop="enterTime" label="进入时间" width="160"></el-table-column>
+                    <el-table-column prop="waitingTime" label="等待时间(分)" width="100"></el-table-column>
+                </el-table>
+            </div>
         </el-card>
     </div>
 </template>
@@ -78,6 +57,8 @@ export default {
 <style scoped>
 .waiting-vehicles {
     margin: 20px;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
 }
 
 .charging-pile-card {
@@ -88,5 +69,14 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+:deep(.el-card__body) {
+    padding: 10px;
 }
 </style>

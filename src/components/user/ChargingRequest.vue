@@ -7,7 +7,7 @@ export default {
         return {
             requestForm: {
                 chargingMode: 1,
-                chargeAmount: 0,
+                requestAmount: 0,
                 batteryCapacity: 0
             }
         };
@@ -15,17 +15,38 @@ export default {
     methods: {
         submitRequest() {
             post('/api/charging/request', this.requestForm, (message) => {
-                ElMessage.success(message);
+                ElMessage.success("请求成功");
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
         },
         changeRequest() {
             post('/api/charging/request/change', this.requestForm, (message) => {
-                ElMessage.success(message);
+                ElMessage.success("修改成功");
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
-        }, 
+        },
         cancelRequest() {
             post('/api/charging/request/cancel', (message) => {
-                ElMessage.success(message);
+                ElMessage.success( "取消成功");
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
         }
     }
@@ -47,7 +68,7 @@ export default {
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="充电量(度)">
-                <el-input-number v-model="requestForm.chargeAmount" :min="1" :max="200" />
+                <el-input-number v-model="requestForm.requestAmount" :min="1" :max="200" />
             </el-form-item>
             <el-form-item label="车辆电池容量(度)">
                 <el-input-number v-model="requestForm.batteryCapacity" :min="1" :max="200" />

@@ -24,12 +24,29 @@ export default {
                     ...item,
                     status: item.status === 1
                 }));
-                ElMessage.success(message);
+                // ElMessage.success(message);
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                }
             });
         },
         handleStatusChange(row) {  // 一旦修改了某个充电桩的状态，就向后端发送修改请求
             post(`/api/admin/pile/${row.id}/status`, { status: row.status ? 1 : 0}, message => {
-                ElMessage.success(message);
+                // ElMessage.success(message);
+            },
+            (code, message) => {
+                if (code === 400) {
+                    ElMessage.error(message);
+                    // 如果修改失败，恢复原状态
+                    row.status = !row.status;
+                } else {
+                    ElMessage.warning(code + ':' + message);
+                    row.status = !row.status;
+                }
             });
         }
     }

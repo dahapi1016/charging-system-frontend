@@ -1,5 +1,6 @@
 <script>
 import { login } from "@/net";
+import { ElMessage } from "element-plus";
 
 export default {
   data() {
@@ -14,8 +15,9 @@ export default {
         username: this.username,
         password: this.password
       };
-      login(data)
-      this.$router.push('/admin/index');
+      login(data, (code, message) => {
+        ElMessage.error(message);
+      });
     }
   }
 };

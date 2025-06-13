@@ -17,8 +17,18 @@ export default {
         password: this.password
       };
       post('/api/user/register', data, (message) => {
-        ElMessage.success(message);
-        this.$router.push('/user/index');
+        ElMessage.success("注册成功！");
+        this.$router.push('/user/login');
+      },
+      (code, message) => {
+        if (code === 400) {
+          ElMessage.error(message);
+        } else {
+          ElMessage.warning(code + ':' + message);
+        }
+      },
+      () => {
+        ElMessage.error('注册失败');
       });
     }
   }
